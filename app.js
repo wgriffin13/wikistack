@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const layout = require('./views/layout')
 const models = require('./models');
+const wikiRouter = require('./routes/wiki');
+const userRouter = require('./routes/user');
 
 const app = express();
 
@@ -16,19 +18,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json())
 
 // Routes
-app.get('/', (req, res, next) => {
-    res.send(layout('<br>Hello World!'));
-});
+app.use('/wiki', wikiRouter);
+app.use('/users', userRouter);
 
-// db.authenticate()
-//     .then(() => {
-//         console.log('connected to the database');
-//     })
+app.get('/', (req, res, next) => {
+    res.redirect('/wiki')
+});
 
 const PORT = process.env.PORT || 3000;
 
 const init = () => {
-    models.db.sync({force: true})
+    models.db.sync({force: false})
         .then(() => {
         app.listen(PORT, () => {
             console.log(`App listening in port ${PORT}`);
